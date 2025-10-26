@@ -1,0 +1,11 @@
+Using version ^1.11.0 for accelerate
+
+Updating dependencies
+Resolving dependencies...
+
+Package operations: 1 install, 1 update, 0 removals
+
+  - Updating psutil (7.1.1 -> 7.1.2)
+  - Installing accelerate (1.11.0)
+
+Writing lock file
