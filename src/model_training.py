@@ -13,7 +13,7 @@ def setup_training_fast(model, train_dataset, eval_dataset, output_dir="./models
     
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=5,                    
+        num_train_epochs=4,                    
         per_device_train_batch_size=64,        
         per_device_eval_batch_size=128,        
         learning_rate=2e-4,
