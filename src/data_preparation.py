@@ -7,8 +7,8 @@ def get_datasets_fast():
     dataset = load_dataset("fashion_mnist")
     
     # Берем только 10% данных для обучения
-    small_train = dataset['train'].select(range(6000))  # 6k вместо 60k
-    small_test = dataset['test'].select(range(1000))    # 1k вместо 10k
+    small_train = dataset['train'].select(range(6000)) 
+    small_test = dataset['test'].select(range(1000))
     
     processor = ViTImageProcessor.from_pretrained("WinKawaks/vit-small-patch16-224")
 

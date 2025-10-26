@@ -1,18 +1,18 @@
 {
   "train_metrics": {
-    "train_runtime": 336.6216,
-    "train_samples_per_second": 32.084,
-    "train_steps_per_second": 0.505,
+    "train_runtime": 343.0197,
+    "train_samples_per_second": 31.485,
+    "train_steps_per_second": 0.496,
     "total_flos": 2.113690854998016e+17,
-    "train_loss": 1.3194196701049805,
+    "train_loss": 1.344450642080868,
     "epoch": 2.0
   },
   "test_metrics": {
-    "eval_loss": 0.7133134603500366,
-    "eval_accuracy": 0.807,
-    "eval_runtime": 40.8919,
-    "eval_samples_per_second": 24.455,
-    "eval_steps_per_second": 0.196,
+    "eval_loss": 0.6628392338752747,
+    "eval_accuracy": 0.82,
+    "eval_runtime": 39.9386,
+    "eval_samples_per_second": 25.038,
+    "eval_steps_per_second": 0.2,
     "epoch": 2.0
   },
   "hyperparameters": {

@@ -1,4 +1,3 @@
-# train.py
 from src.data_preparation import get_datasets_fast
 from src.model_training import setup_training_fast
 from transformers import ViTForImageClassification
@@ -20,23 +19,23 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
-    print("🚀 Запуск процесса fine-tuning ViT на fashion_mnist")
+    print("Запуск процесса fine-tuning ViT на fashion_mnist")
     
-    print("1. Загрузка и подготовка данных...")
+    print("Загрузка и подготовка данных...")
     train_dataset, val_dataset, test_dataset, label_names = get_datasets_fast()
     print(f"   Классы: {label_names}")
     print(f"   Размер тренировочной выборки: {len(train_dataset)}")
     print(f"   Размер валидационной выборки: {len(val_dataset)}")
     print(f"   Размер тестовой выборки: {len(test_dataset)}")
 
-    print("2. Загрузка предобученной модели ViT...")
+    print("Загрузка предобученной модели ViT")
     model = ViTForImageClassification.from_pretrained(
         "WinKawaks/vit-small-patch16-224",
         num_labels=len(label_names),
         ignore_mismatched_sizes=True
     )
     
-    print("3. Заморозка энкодера для fine-tuning...")
+    print("Заморозка энкодера для fine-tuning")
     # Замораживаем все параметры энкодера, обучаем только голову классификатора
     for param in model.vit.parameters():
         param.requires_grad = False
@@ -46,19 +45,19 @@ def main():
     total_params = sum(p.numel() for p in model.parameters())
     print(f"   Обучаемые параметры: {trainable_params:,} из {total_params:,} ({trainable_params/total_params*100:.2f}%)")
 
-    print("4. Настройка процесса обучения...")
+    print("Настройка процесса обучения")
     trainer = setup_training_fast(model, train_dataset, val_dataset)
 
     monitor_gpu()
 
-    print("5. Запуск обучения...")
+    print("Запуск обучения")
     train_result = trainer.train()
 
-    print("6. Сохранение модели...")
+    print("Сохранение модели")
     trainer.save_model()
     trainer.save_state()
 
-    print("7. Оценка на тестовом наборе...")
+    print("Оценка на тестовом наборе")
     test_results = trainer.evaluate(test_dataset)
     
     # Сохраняем метрики
@@ -82,7 +81,7 @@ def main():
     print(f"   Final Train Loss: {train_result.metrics.get('train_loss', 'N/A')}")
     print(f"   Test Accuracy: {test_results.get('eval_accuracy', 0)*100:.2f}%")
     
-    print("✅ Обучение завершено!")
+    print("Обучение завершено!")
 
 if __name__ == "__main__":
     main()
