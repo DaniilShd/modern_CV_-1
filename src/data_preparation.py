@@ -1,48 +1,32 @@
-# src/data_preparation.py
 from transformers import ViTImageProcessor
-from torchvision import transforms
 from datasets import load_dataset
-import torch
 
-def get_data_loaders(batch_size=16):
-    dataset = load_dataset("cifar10")
+def get_datasets_fast():
+    """СУПЕР БЫСТРАЯ версия - 10% данных"""
+    
+    dataset = load_dataset("fashion_mnist")
+    
+    # Берем только 10% данных для обучения
+    small_train = dataset['train'].select(range(6000))  # 6k вместо 60k
+    small_test = dataset['test'].select(range(1000))    # 1k вместо 10k
+    
+    processor = ViTImageProcessor.from_pretrained("WinKawaks/vit-small-patch16-224")
 
-    # Используем процессор от предобученной модели
-    processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
+    def transform_fn(examples):
+        images = [image.convert('RGB') for image in examples['image']]
+        inputs = processor(images, return_tensors='pt')
+        examples['pixel_values'] = [tensor for tensor in inputs.pixel_values]
+        examples['labels'] = examples['label']
+        return examples
 
-    # Определяем трансформации
-    train_transforms = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=processor.image_mean, std=processor.image_std),
-    ])
+    train_dataset = small_train.map(transform_fn, batched=True, remove_columns=['image'])
+    test_dataset = small_test.map(transform_fn, batched=True, remove_columns=['image'])
+    
+    split_datasets = train_dataset.train_test_split(test_size=0.1, seed=42)
+    
+    label_names = [
+        'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+        'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
+    ]
 
-    val_transforms = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=processor.image_mean, std=processor.image_std),
-    ])
-
-    def preprocess_train(example_batch):
-        example_batch['pixel_values'] = [train_transforms(image.convert('RGB')) for image in example_batch['img']]
-        return example_batch
-
-    def preprocess_val(example_batch):
-        example_batch['pixel_values'] = [val_transforms(image.convert('RGB')) for image in example_batch['img']]
-        return example_batch
-
-    # Применяем трансформации и устанавливаем формат для PyTorch
-    train_dataset = dataset['train'].with_transform(preprocess_train)
-    split_dataset = train_dataset.train_test_split(test_size=0.1, seed=42)
-    train_ds = split_dataset['train']
-    val_ds = split_dataset['test']
-    test_ds = dataset['test'].with_transform(preprocess_val)
-
-    # Создаем DataLoader
-    train_dataloader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    val_dataloader = torch.utils.data.DataLoader(val_ds, batch_size=batch_size)
-    test_dataloader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size)
-
-    return train_dataloader, val_dataloader, test_dataloader, dataset['test'].features['label'].names
+    return split_datasets['train'], split_datasets['test'], test_dataset, label_names

@@ -1,33 +1,36 @@
 from transformers import ViTForImageClassification, TrainingArguments, Trainer
 import evaluate
 import numpy as np
+import torch
 
 def compute_metrics(eval_pred):
-    """Вычисление метрик для оценки модели"""
     accuracy_metric = evaluate.load("accuracy")
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
     return accuracy_metric.compute(predictions=predictions, references=labels)
 
-def setup_training(model, train_dataset, eval_dataset, output_dir="./models/vit-cifar10"):
-    """Настройка процесса обучения"""
+def setup_training_fast(model, train_dataset, eval_dataset, output_dir="./models/vit-fashion-mnist-fast"):
+    """УСКОРЕННАЯ версия настроек обучения"""
     
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=3,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        num_train_epochs=2,                    
+        per_device_train_batch_size=64,        
+        per_device_eval_batch_size=128,        
         learning_rate=2e-4,
-        warmup_steps=500,
-        logging_steps=10,
-        eval_strategy="epoch",
+        warmup_steps=50,                      
+        logging_steps=50,                      
+        eval_strategy="no",              
         save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        greater_is_better=True,
+        load_best_model_at_end=False,       
         remove_unused_columns=False,
-        report_to="tensorboard",
-        save_total_limit=2,
+        report_to="none",                     
+        dataloader_pin_memory=True,
+        dataloader_num_workers=2,
+        fp16=torch.cuda.is_available(),   
+        optim="adamw_torch",
+        gradient_accumulation_steps=1,
+        save_total_limit=1,
         push_to_hub=False,
     )
 

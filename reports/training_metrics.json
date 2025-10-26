@@ -1,0 +1,25 @@
+{
+  "train_metrics": {
+    "train_runtime": 609.687,
+    "train_samples_per_second": 17.714,
+    "train_steps_per_second": 0.279,
+    "total_flos": 2.113690854998016e+17,
+    "train_loss": 1.367178103503059,
+    "epoch": 2.0
+  },
+  "test_metrics": {
+    "eval_loss": 0.7060341835021973,
+    "eval_accuracy": 0.82,
+    "eval_runtime": 41.0531,
+    "eval_samples_per_second": 24.359,
+    "eval_steps_per_second": 0.195,
+    "epoch": 2.0
+  },
+  "hyperparameters": {
+    "learning_rate": 0.0002,
+    "batch_size": 32,
+    "epochs": 3,
+    "trainable_parameters": 3850,
+    "total_parameters": 21669514
+  }
+}
